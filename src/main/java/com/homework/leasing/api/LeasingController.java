@@ -2,12 +2,15 @@ package com.homework.leasing.api;
 
 import com.homework.leasing.api.model.request.LeasingApplicationRequest;
 import com.homework.leasing.api.model.response.LeasingApplicationResponse;
+import com.homework.leasing.api.model.response.SubmitApplicationResponse;
 import com.homework.leasing.service.LeasingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
-@RequestMapping("api/v1/lease")
+@RequestMapping("/api/v1/lease")
 public class LeasingController {
 
     private final LeasingService leasingService;
@@ -18,7 +21,7 @@ public class LeasingController {
     }
 
     @PostMapping(value ="/application", produces = "application/json")
-    public String submitApplication(@RequestBody LeasingApplicationRequest application) {
+    public SubmitApplicationResponse submitApplication(@Valid @RequestBody LeasingApplicationRequest application) {
         return leasingService.submit(application);
     }
 
