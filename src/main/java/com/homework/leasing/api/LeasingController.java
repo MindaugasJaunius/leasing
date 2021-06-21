@@ -5,6 +5,8 @@ import com.homework.leasing.api.model.response.LeasingApplicationResponse;
 import com.homework.leasing.api.model.response.LeasingApplicationStatusResponse;
 import com.homework.leasing.api.model.response.SubmitApplicationResponse;
 import com.homework.leasing.service.LeasingService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +18,8 @@ public class LeasingController {
 
     private final LeasingService leasingService;
 
+    private final Logger logger = LoggerFactory.getLogger(LeasingController.class);
+
     @Autowired
     public LeasingController(LeasingService leasingService) {
         this.leasingService = leasingService;
@@ -23,6 +27,7 @@ public class LeasingController {
 
     @PostMapping(value ="/application", produces = "application/json")
     public SubmitApplicationResponse submitApplication(@Valid @RequestBody LeasingApplicationRequest application) {
+        logger.info("Incoming lease application");
         return leasingService.submit(application);
     }
 
