@@ -6,7 +6,6 @@ import com.homework.leasing.api.model.response.LeasingApplicationStatusResponse;
 import com.homework.leasing.api.model.response.SubmitApplicationResponse;
 import com.homework.leasing.repository.LeasingRepository;
 import com.homework.leasing.repository.entity.Lease;
-import com.homework.leasing.repository.entity.LeaseStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,7 +57,26 @@ public class LeasingService {
     public LeasingApplicationResponse fetchApplication(String id) {
         Optional<Lease> lease = leasingRepository.findById(UUID.fromString(id));
         LeasingApplicationResponse response = new LeasingApplicationResponse();
-        response.setApplicationId(lease.isPresent() ? lease.get().getId().toString() : "not_found");
+
+        if(lease.isPresent()) {
+            response.setSubmissionDate(lease.get().getSubmissionDate().toString());
+
+            response.setApplicantsEmail(lease.get().getApplicantsEmail());
+            response.setApplicantsPhone(lease.get().getApplicantsPhone());
+            response.setApplicantsPersonalNumber(lease.get().getApplicantsPersonalNumber());
+            response.setApplicantsSalary(lease.get().getApplicantsSalary().toString());
+
+            response.setCoApplicantsPersonalNumber(lease.get().getCoApplicantsPersonalNumber());
+            response.setCoApplicantsSalary(lease.get().getCoApplicantsSalary().toString());
+
+            response.setCarVinNumber(lease.get().getCarVinNumber());
+            response.setRequestedAmount(lease.get().getRequestedAmount().toString());
+
+            response.setStatus(lease.get().getStatus().name());
+        } else {
+            response.setStatus("not_found");
+        }
+
         return response;
     }
 

@@ -1,6 +1,7 @@
 package com.homework.leasing.service;
 
 import com.homework.leasing.api.model.request.LeasingApplicationRequest;
+import com.homework.leasing.api.model.response.LeasingApplicationResponse;
 import com.homework.leasing.api.model.response.LeasingApplicationStatusResponse;
 import com.homework.leasing.api.model.response.SubmitApplicationResponse;
 import com.homework.leasing.repository.LeasingRepository;
@@ -128,5 +129,54 @@ public class LeasingServiceTest {
 
         assertEquals("not_found", response.getStatus());
         assertEquals("not_found", response.getCarVinNumber());
+    }
+
+    @Test
+    public void fetch_application_calls_repository_once() {
+        leasingService.fetchApplication("df99580a-4f06-47c9-aa47-2e546f7ad17f");
+
+        verify(repository, times(1)).findById(any(UUID.class));
+    }
+
+    @Test
+    public void fetch_application_parameters_remapped() {
+        Lease mockedLease = new Lease();
+        mockedLease.setSubmissionDate(LocalDateTime.now());
+        mockedLease.setApplicantsEmail("value@domain.lt");
+        mockedLease.setApplicantsPhone("+37000000000");
+        mockedLease.setApplicantsPersonalNumber("0123456789");
+        mockedLease.setApplicantsSalary(new BigDecimal("111.11"));
+        mockedLease.setCoApplicantsPersonalNumber("9876543210");
+        mockedLease.setCoApplicantsSalary(new BigDecimal("222.22"));
+        mockedLease.setCarVinNumber("123123123");
+        mockedLease.setRequestedAmount(new BigDecimal("333.33"));
+        mockedLease.setStatus(LeaseStatus.PENDING);
+
+        when(repository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(mockedLease));
+
+        LeasingApplicationResponse response = leasingService
+                .fetchApplication("df99580a-4f06-47c9-aa47-2e546f7ad17f");
+
+        assertEquals(mockedLease.getSubmissionDate().toString(), response.getSubmissionDate());
+        assertEquals(mockedLease.getApplicantsEmail(), response.getApplicantsEmail());
+        assertEquals(mockedLease.getApplicantsPhone(), response.getApplicantsPhone());
+        assertEquals(mockedLease.getApplicantsPersonalNumber(), response.getApplicantsPersonalNumber());
+        assertEquals(mockedLease.getApplicantsSalary().toString(), response.getApplicantsSalary());
+        assertEquals(mockedLease.getCoApplicantsPersonalNumber(), response.getCoApplicantsPersonalNumber());
+        assertEquals(mockedLease.getCoApplicantsSalary().toString(), response.getCoApplicantsSalary());
+        assertEquals(mockedLease.getCarVinNumber(), response.getCarVinNumber());
+        assertEquals(mockedLease.getRequestedAmount().toString(), response.getRequestedAmount());
+        assertEquals(mockedLease.getStatus().name(), response.getStatus());
+
+    }
+
+    @Test
+    public void fetch_application_not_found() {
+        when(repository.findById(any(UUID.class))).thenReturn(Optional.empty());
+
+        LeasingApplicationResponse response = leasingService
+                .fetchApplication("df99580a-4f06-47c9-aa47-2e546f7ad17f");
+
+        assertEquals("not_found", response.getStatus());
     }
 }
