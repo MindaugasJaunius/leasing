@@ -18,9 +18,12 @@ public class LeasingService {
 
     private final LeasingRepository leasingRepository;
 
+    private final LeasingRulesService leasingRules;
+
     @Autowired
-    public LeasingService(LeasingRepository leasingRepository) {
+    public LeasingService(LeasingRepository leasingRepository, LeasingRulesService leasingRules) {
         this.leasingRepository = leasingRepository;
+        this.leasingRules = leasingRules;
     }
 
     public SubmitApplicationResponse submit(LeasingApplicationRequest applicationRequest) {
@@ -38,7 +41,9 @@ public class LeasingService {
         newLease.setCarVinNumber(applicationRequest.getCarVinNumber());
         newLease.setRequestedAmount(applicationRequest.getRequestedAmount());
 
-        newLease.setStatus(LeaseStatus.PENDING);
+        newLease.setStatus(leasingRules.determineLeaseApplicationStatus(
+                leasingRules.countHouseholdIncome(applicationRequest.getApplicantsSalary(),
+                        Optional.ofNullable(applicationRequest.getCoApplicantsSalary()))));
 
         Lease savedLease = leasingRepository.save(newLease);
 

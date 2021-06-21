@@ -26,10 +26,13 @@ import static org.mockito.Mockito.*;
 public class LeasingServiceTest {
 
     @InjectMocks
-    private LeasingService service;
+    private LeasingService leasingService;
 
     @Mock
     private LeasingRepository repository;
+
+    @Mock
+    private LeasingRulesService rulesService;
 
     @Captor
     private ArgumentCaptor<Lease> leaseCaptor;
@@ -41,7 +44,7 @@ public class LeasingServiceTest {
         mockedLease.setStatus(LeaseStatus.PENDING);
         when(repository.save(any(Lease.class))).thenReturn(mockedLease);
 
-        service.submit(new LeasingApplicationRequest());
+        leasingService.submit(new LeasingApplicationRequest());
 
         verify(repository, times(1)).save(any(Lease.class));
     }
@@ -53,7 +56,7 @@ public class LeasingServiceTest {
         mockedLease.setStatus(LeaseStatus.PENDING);
         when(repository.save(any(Lease.class))).thenReturn(mockedLease);
 
-        SubmitApplicationResponse response = service.submit(new LeasingApplicationRequest());
+        SubmitApplicationResponse response = leasingService.submit(new LeasingApplicationRequest());
 
         assertEquals(mockedLease.getId().toString(), response.getApplicationId());
         assertEquals(mockedLease.getStatus().name(), response.getStatus());
@@ -65,6 +68,7 @@ public class LeasingServiceTest {
         mockedLease.setId(UUID.fromString("df99580a-4f06-47c9-aa47-2e546f7ad17f"));
         mockedLease.setStatus(LeaseStatus.PENDING);
         when(repository.save(any(Lease.class))).thenReturn(mockedLease);
+        when(rulesService.determineLeaseApplicationStatus(any())).thenReturn(LeaseStatus.PENDING);
 
         LeasingApplicationRequest request = new LeasingApplicationRequest();
         request.setApplicantsEmail("value@domain.lt");
@@ -76,7 +80,7 @@ public class LeasingServiceTest {
         request.setCarVinNumber("123123123");
         request.setRequestedAmount(new BigDecimal("333.33"));
 
-        service.submit(request);
+        leasingService.submit(request);
 
         verify(repository).save(leaseCaptor.capture());
 

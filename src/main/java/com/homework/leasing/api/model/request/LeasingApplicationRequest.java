@@ -1,9 +1,6 @@
 package com.homework.leasing.api.model.request;
 
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 
 public class LeasingApplicationRequest {
@@ -22,11 +19,9 @@ public class LeasingApplicationRequest {
     @NotNull
     private BigDecimal applicantsSalary;
 
-    @NotBlank
     private String coApplicantsPersonalNumber;
 
     @Digits(integer=7, fraction=2)
-    @NotNull
     private BigDecimal coApplicantsSalary;
 
     @NotBlank

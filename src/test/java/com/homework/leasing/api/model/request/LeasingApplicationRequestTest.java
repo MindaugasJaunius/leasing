@@ -45,6 +45,6 @@ public class LeasingApplicationRequestTest {
 
     @Test
     public void all_validation_exceptions_present() {
-        assertEquals(8, validator.validate(new LeasingApplicationRequest()).size());
+        assertEquals(6, validator.validate(new LeasingApplicationRequest()).size());
     }
 }
