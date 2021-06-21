@@ -2,6 +2,7 @@ package com.homework.leasing.service;
 
 import com.homework.leasing.api.model.request.LeasingApplicationRequest;
 import com.homework.leasing.api.model.response.LeasingApplicationResponse;
+import com.homework.leasing.api.model.response.LeasingApplicationStatusResponse;
 import com.homework.leasing.api.model.response.SubmitApplicationResponse;
 import com.homework.leasing.repository.LeasingRepository;
 import com.homework.leasing.repository.entity.Lease;
@@ -61,9 +62,19 @@ public class LeasingService {
         return response;
     }
 
-    public String fetchApplicationStatus(String id) {
+    public LeasingApplicationStatusResponse fetchApplicationStatus(String id) {
         Optional<Lease> lease = leasingRepository.findById(UUID.fromString(id));
-        return lease.isPresent() ? lease.get().getStatus().toString() : "not_found";
+        LeasingApplicationStatusResponse response = new LeasingApplicationStatusResponse();
+
+        if(lease.isPresent()) {
+            response.setStatus(lease.get().getStatus().name());
+            response.setCarVinNumber(lease.get().getCarVinNumber());
+        } else {
+            response.setStatus("not_found");
+            response.setCarVinNumber("not_found");
+        }
+
+        return response;
     }
 
 }

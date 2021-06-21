@@ -1,6 +1,7 @@
 package com.homework.leasing.api;
 
 import com.homework.leasing.api.model.request.LeasingApplicationRequest;
+import com.homework.leasing.api.model.response.LeasingApplicationStatusResponse;
 import com.homework.leasing.api.model.response.SubmitApplicationResponse;
 import com.homework.leasing.service.LeasingService;
 import org.junit.jupiter.api.Test;
@@ -71,6 +72,23 @@ public class LeasingControllerTest {
         mockMvc.perform(request).andExpect(status().isBadRequest());
 
         verify(service, times(0)).submit(any(LeasingApplicationRequest.class));
+    }
+
+    @Test
+    public void fetch_application_status_successful () throws Exception {
+        LeasingApplicationStatusResponse response = new LeasingApplicationStatusResponse();
+        response.setCarVinNumber("mocked_vin_number");
+        response.setStatus("mocked_status");
+        when(service.fetchApplicationStatus(any(String.class))).thenReturn(response);
+
+        RequestBuilder request = MockMvcRequestBuilders.get("/api/v1/lease/application/123/status");
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.carVinNumber", is(response.getCarVinNumber())))
+                .andExpect(jsonPath("$.status", is(response.getStatus())));
+
+        verify(service, times(1)).fetchApplicationStatus(any(String.class));
     }
 
 }

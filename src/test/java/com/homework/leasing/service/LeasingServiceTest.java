@@ -1,6 +1,7 @@
 package com.homework.leasing.service;
 
 import com.homework.leasing.api.model.request.LeasingApplicationRequest;
+import com.homework.leasing.api.model.response.LeasingApplicationStatusResponse;
 import com.homework.leasing.api.model.response.SubmitApplicationResponse;
 import com.homework.leasing.repository.LeasingRepository;
 import com.homework.leasing.repository.entity.Lease;
@@ -15,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -94,5 +96,37 @@ public class LeasingServiceTest {
         assertEquals(request.getCarVinNumber(), leaseCaptor.getValue().getCarVinNumber());
         assertEquals(request.getRequestedAmount(), leaseCaptor.getValue().getRequestedAmount());
         assertTrue(leaseCaptor.getValue().getStatus().equals(LeaseStatus.PENDING));
+    }
+
+    @Test
+    public void fetch_application_status_calls_repository_once() {
+        leasingService.fetchApplicationStatus("df99580a-4f06-47c9-aa47-2e546f7ad17f");
+
+        verify(repository, times(1)).findById(any(UUID.class));
+    }
+
+    @Test
+    public void fetch_application_status_parameters_remapped() {
+        Lease mockedLease = new Lease();
+        mockedLease.setCarVinNumber("mocked_vin_number");
+        mockedLease.setStatus(LeaseStatus.PENDING);
+        when(repository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(mockedLease));
+
+        LeasingApplicationStatusResponse response = leasingService
+                .fetchApplicationStatus("df99580a-4f06-47c9-aa47-2e546f7ad17f");
+
+        assertEquals(mockedLease.getStatus().name(), response.getStatus());
+        assertEquals(mockedLease.getCarVinNumber(), response.getCarVinNumber());
+    }
+
+    @Test
+    public void fetch_application_status_application_not_found() {
+        when(repository.findById(any(UUID.class))).thenReturn(Optional.empty());
+
+        LeasingApplicationStatusResponse response = leasingService
+                .fetchApplicationStatus("df99580a-4f06-47c9-aa47-2e546f7ad17f");
+
+        assertEquals("not_found", response.getStatus());
+        assertEquals("not_found", response.getCarVinNumber());
     }
 }

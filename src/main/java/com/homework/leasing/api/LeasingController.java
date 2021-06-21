@@ -2,6 +2,7 @@ package com.homework.leasing.api;
 
 import com.homework.leasing.api.model.request.LeasingApplicationRequest;
 import com.homework.leasing.api.model.response.LeasingApplicationResponse;
+import com.homework.leasing.api.model.response.LeasingApplicationStatusResponse;
 import com.homework.leasing.api.model.response.SubmitApplicationResponse;
 import com.homework.leasing.service.LeasingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class LeasingController {
     }
 
     @GetMapping(value = "/application/{applicationId}/status", produces = "application/json")
-    public String fetchStatus(@PathVariable(value = "applicationId") String applicationId) {
+    public LeasingApplicationStatusResponse fetchStatus(@PathVariable(value = "applicationId") String applicationId) {
         return leasingService.fetchApplicationStatus(applicationId);
     }
 
